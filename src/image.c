@@ -409,21 +409,22 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             //sprintf(labelstr, "%d x %d - w: %d, h: %d", b_x_center, b_y_center, b_width, b_height);
 
             // you should create directory: result_img
-            //static int copied_frame_id = -1;
-            //static image copy_img;
-            //if (copied_frame_id != frame_id) {
-            //    copied_frame_id = frame_id;
-            //    if (copy_img.data) free_image(copy_img);
-            //    copy_img = copy_image(im);
-            //}
-            //image cropped_im = crop_image(copy_img, left, top, right - left, bot - top);
-            //static int img_id = 0;
-            //img_id++;
-            //char image_name[1024];
-            //int best_class_id = selected_detections[i].best_class;
-            //sprintf(image_name, "result_img/img_%d_%d_%d_%s.jpg", frame_id, img_id, best_class_id, names[best_class_id]);
-            //save_image(cropped_im, image_name);
-            //free_image(cropped_im);
+            static int copied_frame_id = -1;
+            static image copy_img;
+            if (copied_frame_id != frame_id) {
+                copied_frame_id = frame_id;
+                if (copy_img.data) free_image(copy_img);
+                copy_img = copy_image(im);
+            }
+            image cropped_im = crop_image(copy_img, left, top, right - left, bot - top);
+            static int img_id = 0;
+            img_id++;
+            char image_name[1024];
+            int best_class_id = selected_detections[i].best_class;
+            sprintf(image_name, "result_img/img_%d_%d_%d_%s.jpg", frame_id, img_id, best_class_id, names[best_class_id]);
+            save_image(cropped_im, image_name);
+            free_image(cropped_im);
+            //printf("%0*d\n", 20, 0);
 
             if (im.c == 1) {
                 draw_box_width_bw(im, left, top, right, bot, width, 0.8);    // 1 channel Black-White
@@ -445,6 +446,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
                 //draw_label(im, top + width, left, label, rgb);
                 draw_weighted_label(im, top + width, left, label, rgb, 0.7);
                 free_image(label);
+
             }
             if (selected_detections[i].det.mask) {
                 image mask = float_to_image(14, 14, 1, selected_detections[i].det.mask);
